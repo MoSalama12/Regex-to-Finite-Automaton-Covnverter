@@ -1,0 +1,14 @@
+﻿  main.cpp
+  NFA.cpp
+  regularExpression.cpp
+  State.cpp
+  Transition.cpp
+  WalnutApp.cpp
+C:\Users\PC\source\repos\Walnut\WalnutApp\src\WalnutApp.cpp(128,65): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\PC\source\repos\Walnut\WalnutApp\src\WalnutApp.cpp(167,1): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\PC\source\repos\Walnut\WalnutApp\src\WalnutApp.cpp(278,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\PC\source\repos\Walnut\WalnutApp\src\WalnutApp.cpp(311,1): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\PC\source\repos\Walnut\WalnutApp\src\WalnutApp.cpp(442,135): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\PC\source\repos\Walnut\WalnutApp\src\WalnutApp.cpp(445,143): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  Generating Code...
+  WalnutApp.vcxproj -> C:\Users\PC\source\repos\Walnut\bin\Debug-windows-x86_64\WalnutApp\WalnutApp.exe
