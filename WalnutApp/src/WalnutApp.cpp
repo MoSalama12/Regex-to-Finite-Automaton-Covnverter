@@ -160,11 +160,16 @@ public:
                     }
                 }
                 else { // DFA
-		    nfa.setStartState();
+
+                    nfa.setStartState();
                     State startState = nfa.getStartState();
                     int stateCount = startState.getStatesCount();
                     int symbolsCount = symbols.size() + 1;
                     int start = startState.getNumber();
+
+                    //std::cout << stateCount << std::endl;
+
+                    //std::cout << "Starting State is:   |" << startState.getName() << "|\n\n";
 
                     std::vector<int>** nfaTable = nfa.constructTransitionTable2();
                     std::set<int> epClosure;
@@ -223,7 +228,94 @@ public:
                         }
 
                     }
+
+                    static std::vector<char> symbolsVec;
+
+                    for (auto s : symbols)
+                    {
+                        //std::cout << "\t\t\t" << s;
+                        symbolsVec.push_back(s);
+                    }
+                    //std::cout << std::endl;
+
+                    for (auto transition : allTransitions)
+                    {
+                        std::string collectTransition("");
+                        bool isAccapted = false;
+                        for (auto node : transition)
+                        {
+                            collectTransition += std::to_string(node);
+
+                            //std::cout << node << " " << stateCount - 1 << std::endl;
+                            if (node == stateCount - 1)
+                                isAccapted = true;
+                        }
+
+                        points.push_back(new Diagram(ImVec2(150, 100), collectTransition));
+
+                        if (isAccapted)
+                            points[points.size() - 1]->isAccept = true;
+                    }
                     
+                    int counter = 0;
+                    for (auto transition : allTransitions)
+                    {
+                        for (int i = 0; i < symbolsCount - 1; i++)
+                        {
+                            std::string collectNodes("");
+                            for (auto node : dfaTable[{transition, i+1}])
+                            {
+                                //std::cout << node << " ";
+                                collectNodes += std::to_string(node);
+                            }
+                            // search for that state
+
+                            int NodeIndex = -1;
+                            for (size_t j = 0; j < points.size(); j++)
+                            {
+                                if (collectNodes == points[j]->state)
+                                {
+                                    NodeIndex = j;
+                                    break;
+                                }
+                            }
+
+                            //std::cout << (symbolsVec[i]) << std::endl;
+                            
+                            std::string s("");
+                            s += symbolsVec[i];
+                            points[counter]->next.push_back(std::make_pair(points[NodeIndex], s));
+
+                        }
+                        counter++;
+                    }
+
+                    std::set<std::string> collectStatesFromNextOnly;
+                    for (size_t i = 0; i < points.size(); i++)
+                    {
+                        for (size_t j = 0; j < points[i]->next.size(); j++)
+                        {
+                            //std::cout << points[i]->next[j].first->state;
+                            collectStatesFromNextOnly.insert(points[i]->next[j].first->state);
+                        }
+                        //std::cout << " ";
+                    }
+                    //std::cout << std::endl;
+
+                    for (size_t i = 0 ; i < points.size(); i++)
+                    {
+                        //std::cout << points[i]->state << std::endl;
+                        if (collectStatesFromNextOnly.find(points[i]->state) == collectStatesFromNextOnly.end())
+                        {
+                            points[i]->isStart = true;
+                            startIndex =  i;
+                            break;
+                        }
+                    }
+
+                    //std::string testString ("");
+
+                    //std::cout << (isAcceptedText(points, startIndex , testString) ? "Accepted" : "Rejected") ;
 
                 }
             }
@@ -452,6 +544,19 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 		}
 	});*/
 	return app;
+}
+
+
+void dfs(int src, bool* vis, std::vector<int>** nfaTable, int indx)
+{
+    vis[src] = 1;
+    for (auto a : nfaTable[src][indx])
+    {
+        if (!vis[a])
+        {
+            dfs(a, vis, nfaTable, indx);
+        }
+    }
 }
 
 bool isAcceptedText(const std::vector<Diagram*> points, const int& startIndex, const std::string& Text)
