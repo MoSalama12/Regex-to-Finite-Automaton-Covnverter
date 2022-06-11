@@ -160,7 +160,69 @@ public:
                     }
                 }
                 else { // DFA
+		    nfa.setStartState();
+                    State startState = nfa.getStartState();
+                    int stateCount = startState.getStatesCount();
+                    int symbolsCount = symbols.size() + 1;
+                    int start = startState.getNumber();
 
+                    std::vector<int>** nfaTable = nfa.constructTransitionTable2();
+                    std::set<int> epClosure;
+                    std::vector<std::set<int>> allTransitions;
+                    std::map<std::pair<std::set<int>, int>, std::set<int>> dfaTable;
+
+                    // DFA Code
+
+                    bool vis[MAX_STATE_COUNT + 2];
+                    memset(vis, 0, sizeof vis);
+                    dfs(start, vis, nfaTable, 0);
+
+                    for (int i = 0; i <= stateCount; i++)
+                    {
+                        if (vis[i]) epClosure.insert(i);
+                    }
+
+                    allTransitions.push_back(epClosure);
+                    for (int currentTransition = 0; currentTransition < allTransitions.size(); currentTransition++)
+                    {
+                        std::set<int> from = allTransitions[currentTransition];
+                        for (int i = 1; i < symbolsCount; i++)
+                        {
+                            bool visited[MAX_STATE_COUNT + 2] = { 0 }, v[MAX_STATE_COUNT + 2] = { 0 };
+
+                            if (std::find(from.begin(), from.end(), start) != from.end())
+                            {
+                                v[start] = 1;
+                            }
+                            for (auto f : from)
+                            {
+                                for (auto node : nfaTable[f][i])
+                                {
+                                    if (!visited[node])
+                                    {
+                                        dfs(node, visited, nfaTable, i);
+                                        dfs(node, visited, nfaTable, 0);
+                                    }
+                                }
+                            }
+
+                            std::set<int> to;
+                            for (int j = 0; j <= stateCount; j++)
+                            {
+                                if (visited[j])
+                                {
+                                    to.insert(j);
+                                }
+                            }
+
+                            dfaTable[{from, i}] = to;
+                            if (find(allTransitions.begin(), allTransitions.end(), to) == allTransitions.end())
+                            {
+                                allTransitions.push_back(to);
+                            }
+                        }
+
+                    }
                     
 
                 }
@@ -390,19 +452,6 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 		}
 	});*/
 	return app;
-}
-
-
-void dfs(int src, bool* vis, std::vector<int>** nfaTable, int indx)
-{
-    vis[src] = 1;
-    for (auto a : nfaTable[src][indx])
-    {
-        if (!vis[a])
-        {
-            dfs(a, vis, nfaTable, indx);
-        }
-    }
 }
 
 bool isAcceptedText(const std::vector<Diagram*> points, const int& startIndex, const std::string& Text)
